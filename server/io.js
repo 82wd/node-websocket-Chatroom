@@ -4,7 +4,9 @@ const io = require('socket.io')({
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
-  serveClient:false
+  serveClient:false,
+  // 增加消息大小限制到6MB（考虑base64编码会增加约33%的大小）
+  maxHttpBufferSize: 6 * 1024 * 1024
 });
 const jwt=require("./jwt");
 const store=require("./store");

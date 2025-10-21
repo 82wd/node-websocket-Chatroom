@@ -399,7 +399,10 @@
       },
       initSocket(){
         let _this=this;
-        const manager = new Manager(this.socketURL);
+        const manager = new Manager(this.socketURL, {
+          // 增加客户端消息大小限制到6MB
+          maxPayload: 6 * 1024 * 1024
+        });
         const socket = manager.socket("/");
         _this.socket=socket;
         _this.socket.on("error",()=>{

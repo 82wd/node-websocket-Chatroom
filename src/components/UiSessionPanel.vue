@@ -97,9 +97,9 @@
           Message.warning("请选择正确格式的图片文件!");
           return
         }
-        let maxSize=1*1024*1024;
+        let maxSize=5*1024*1024; // 改为5MB
         if(file.size>maxSize){
-          Message.warning("图片大小不能超过1M!","warning");
+          Message.warning("图片大小不能超过5M!");
           return
         }
         let reader = new FileReader();
