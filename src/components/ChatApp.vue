@@ -346,9 +346,6 @@
             title:"设置"
           },
           {
-            name:"about",
-            icon:"iconfont icon-info",
-            title:"关于"
           },
         ],
         curMenu:"chat",
