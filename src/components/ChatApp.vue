@@ -101,41 +101,7 @@
             </ul>
           </div>
         </div>
-        <div class="app-container-panel" v-show="curMenu==='about'">
-          <div class="app-card-panel">
-            <div class="app-card-title">关于</div>
-            <ul class="ui-list app-setting" @mousedown.stop>
-              <li>
-                <span class="ui-label">版本：</span>
-                <span class="ui-text">{{about.version}}</span>
-              </li>
-              <li>
-                <span class="ui-label">协议：</span>
-                <span class="ui-text">{{about.license}}</span>
-              </li>
-              <li>
-                <span class="ui-label">作者：</span>
-                <span class="ui-text">{{about.author}}</span>
-              </li>
-              <li>
-                <span class="ui-label">邮箱：</span>
-                <span class="ui-text">{{about.email}}</span>
-              </li>
-              <li>
-                <span class="ui-label">仓库：</span>
-                <a class="ui-link" :href="about.github" target="_blank">GitHub</a>
-              </li>
-              <li>
-                <a class="ui-link" :href="about.github" target="_blank">
-                  <img src="https://img.shields.io/github/stars/cleverqin/node-websocket-Chatroom?label=Star&style=flat&logo=github" alt="">
-                </a>
-                <a class="ui-link" :href="about.github" target="_blank">
-                  <img src="https://img.shields.io/github/forks/cleverqin/node-websocket-Chatroom?label=Fork&style=flat&logo=github" alt="">
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
+
       </div>
       <span class="iconfont icon-09" v-if="socket&&!isConnect" title="断线重连"></span>
     </div>
@@ -203,39 +169,7 @@
             </li>
           </ul>
         </div>
-        <div class="app-iChat-panel" v-show="curMenu==='about'">
-          <div class="app-card-title">关于</div>
-          <ul class="ui-list app-setting">
-            <li>
-              <span class="ui-label">版本：</span>
-              <span class="ui-text">{{about.version}}</span>
-            </li>
-            <li>
-              <span class="ui-label">协议：</span>
-              <span class="ui-text">{{about.license}}</span>
-            </li>
-            <li>
-              <span class="ui-label">作者：</span>
-              <span class="ui-text">{{about.author}}</span>
-            </li>
-            <li>
-              <span class="ui-label">邮箱：</span>
-              <span class="ui-text">{{about.email}}</span>
-            </li>
-            <li>
-              <span class="ui-label">仓库：</span>
-              <a class="ui-link" :href="about.github" target="_blank">GitHub</a>
-            </li>
-            <li>
-              <a class="ui-link" :href="about.github" target="_blank">
-                <img src="https://img.shields.io/github/stars/cleverqin/node-websocket-Chatroom?label=Star&style=flat&logo=github" alt="">
-              </a>
-              <a class="ui-link" :href="about.github" target="_blank">
-                <img src="https://img.shields.io/github/forks/cleverqin/node-websocket-Chatroom?label=Fork&style=flat&logo=github" alt="">
-              </a>
-            </li>
-          </ul>
-        </div>
+
       </div>
       <div class="app-iChat-footer">
         <ul class="app-iChat-menus ui-clear">
@@ -344,9 +278,7 @@
             name:"setting",
             icon:"iconfont icon-cog",
             title:"设置"
-          },
-          {
-          },
+          }
         ],
         curMenu:"chat",
         users:[],
@@ -357,13 +289,6 @@
           isName: true,
           isTime:true,
           isVoice:true
-        },
-        about:{
-          version:"v1.0",
-          license:"MIT",
-          author:"cleverqin",
-          email:"705597001@qq.com",
-          github:"https://github.com/cleverqin/node-websocket-Chatroom"
         },
         loginUser:{},
         token:"",
