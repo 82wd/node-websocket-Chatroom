@@ -10,7 +10,8 @@ const io = require('socket.io')({
 });
 const jwt=require("./jwt");
 const store=require("./store");
-const util={
+const { filterText } = require('./sensitive');
+util={
   async login(user,socket,isReconnect) {
     let ip=socket.handshake.address.replace(/::ffff:/,"");
     const headers = socket.handshake.headers;
@@ -45,13 +46,22 @@ const util={
       token:jwt.token(user)
     };
     socket.broadcast.emit('system', user, 'join');
-    socket.on('message',(from, to,message,type)=> {
-      if(to.type==='user'){
-        socket.broadcast.to(to.roomId).emit('message', socket.user, to,message,type);
+    socket.on('message',(from, to, message, type)=> {
+      // 仅对群聊消息进行敏感词替换，私聊不替换
+      if (to && to.type === 'group' && typeof message === 'string') {
+        try {
+          message = filterText(message);
+        } catch (e) {
+          console.error('敏感词过滤出错', e);
+        }
       }
-      if(to.type==='group'){
-        socket.broadcast.emit('message', socket.user,to,message,type);
-        store.saveMessage(from,to,message,type)
+
+      if (to && to.type === 'user') {
+        socket.broadcast.to(to.roomId).emit('message', socket.user, to, message, type);
+      }
+      if (to && to.type === 'group') {
+        socket.broadcast.emit('message', socket.user, to, message, type);
+        store.saveMessage(from, to, message, type);
       }
     });
     const users=await this.getOnlineUsers();
@@ -126,3 +136,26 @@ io.sockets.on('connection',(socket)=>{
   }
 });
 module.exports=io;
+
+io.on('connection', (socket) => {
+  // ...existing code...
+
+  // 把 message 事件处理器放在这里，确保 socket 已定义
+  socket.on('message', (msg) => {
+    try {
+      // 根据项目实际字段调整私聊判断逻辑
+      const isPrivate = Boolean(msg && (msg.isPrivate || (msg.to && msg.to !== 'chatroom' && msg.to !== 'global')));
+
+      if (!isPrivate && msg && typeof msg.content === 'string') {
+        msg.content = filterText(msg.content);
+      }
+    } catch (err) {
+      // 容错：日志或忽略
+      console.error('消息过滤出错', err);
+    }
+
+    // ...existing code that广播/处理 msg ...
+  });
+
+  // ...existing code...
+});
