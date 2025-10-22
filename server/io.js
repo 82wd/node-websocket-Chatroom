@@ -57,7 +57,9 @@ util={
       }
 
       if (to && to.type === 'user') {
-        socket.broadcast.to(to.roomId).emit('message', socket.user, to, message, type);
+        // 使用 io.to 确保发送到目标 socket id；并回显给发送者
+        io.to(to.roomId).emit('message', socket.user, to, message, type);
+        socket.emit('message', socket.user, to, message, type);
       }
       if (to && to.type === 'group') {
         socket.broadcast.emit('message', socket.user, to, message, type);
