@@ -46,13 +46,54 @@ util={
       token:jwt.token(user)
     };
     socket.broadcast.emit('system', user, 'join');
-    socket.on('message',(from, to, message, type)=> {
+    socket.on('message', async (from, to, message, type)=> {
       // 仅对群聊消息进行敏感词替换，私聊不替换
       if (to && to.type === 'group' && typeof message === 'string') {
         try {
           message = filterText(message);
         } catch (e) {
           console.error('敏感词过滤出错', e);
+        }
+      }
+
+      // 群聊 @ 功能：解析 @username 或 @all/@所有人，并发送单独的 mention 事件
+      if (to && to.type === 'group' && typeof message === 'string') {
+        try {
+          const mentionRegex = /@([\w\u4e00-\u9fa5\-\_\.]{1,30})/g;
+          const mentions = [];
+          let m;
+          while ((m = mentionRegex.exec(message)) !== null) {
+            mentions.push(m[1]);
+          }
+
+          if (mentions.length > 0) {
+            // 支持 @all / @所有人 / @everyone 群体提醒
+            const isAll = mentions.some(n => /^(all|所有人|everyone)$/i.test(n));
+            if (isAll) {
+              // 广播 mention（包括发送者回显）
+              socket.broadcast.emit('mention', { from: socket.user, to, message, type, isAll: true });
+              socket.emit('mention', { from: socket.user, to, message, type, isAll: true });
+            } else {
+              // 单独通知被@的在线用户
+              const clients = await io.fetchSockets();
+              const notified = new Set();
+              for (const name of mentions) {
+                for (const client of clients) {
+                  if (client.user && client.user.name === name && !notified.has(client.id)) {
+                    // 发送 mention 给目标用户（回显给发送者也发送一次）
+                    io.to(client.id).emit('mention', { from: socket.user, to, message, type, name });
+                    notified.add(client.id);
+                  }
+                }
+              }
+              // 回显给发送者（可用于本地高亮）
+              if (notified.size > 0) {
+                socket.emit('mention-sent', { from: socket.user, to, message, type, names: Array.from(notified) });
+              }
+            }
+          }
+        } catch (e) {
+          console.error('处理 @ 提及出错', e);
         }
       }
 
