@@ -301,8 +301,28 @@
     },
     mounted(){
       this.initSocket();
+      const sock = this.$socket || this.socket || this.$root.socket; // 替换为你的实例
+      if (sock) {
+        sock.on('mention', (payload) => {
+          // payload: { from, to, message, type, name?, isAll? }
+          const fromName = payload.from && payload.from.name;
+          if (payload.isAll) {
+            this.showMentionNotice(`${fromName} @了所有人：${payload.message}`);
+          } else {
+            this.showMentionNotice(`${fromName} @了你：${payload.message}`);
+          }
+        });
+        sock.on('mention-sent', (info) => {
+          // 发送者回执（可选）
+          console.log('mention-sent', info);
+        });
+      }
     },
     methods:{
+      showMentionNotice(text) {
+        // 简单演示：可替换为 UI 高亮/弹窗/声音
+        alert(text);
+      },
       searchUser(keyword){
         let arr=[];
         this.users.forEach( (item )=>{
